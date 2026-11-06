@@ -59,15 +59,20 @@
         "timeout": false,
         "worktree": false
       },
-      "env": {},
+      "env": {
+        "CODEBUDDY_FORCE_LITE_WB_BUNDLE": "1"
+      },
       "failPattern": [
         "Authentication required",
         "not signed in",
-        "/login"
+        "/login",
+        "Cannot find module",
+        "EADDRINUSE",
+        "codebuddy-lite-wb"
       ],
       "timeoutMin": 20,
-      "hint": "需先跑一次 codebuddy /login（浏览器授权，和桌面版登录分开）；必须带 --port。实测未登录时 exit 0 但输出 Authentication required，本工具判 78",
-      "fix": "node \"D:/workbuddy/resources/app.asar.unpacked/cli/bin/codebuddy\" /login"
+      "hint": "这个发行版 cli/dist 只有 codebuddy-lite-wb.mjs、没有完整版 bundle，默认入口会报 Cannot find module；适配表已注入 CODEBUDDY_FORCE_LITE_WB_BUNDLE=1 强制走 lite-wb，并用 {port} 自动取空闲端口（桌面版常占 55298）。剩下一件事：进一次 TUI 输 /login 完成浏览器授权，和桌面版登录分开；/login 是 TUI 内的斜杠命令，不是命令行参数",
+      "fix": "运行 login-agents.ps1 选 1（自动设 env + 空闲端口），进 TUI 后输 /login"
     },
     "zcode": {
       "label": "ZCode",
@@ -95,8 +100,8 @@
         "Select a model"
       ],
       "timeoutMin": 20,
-      "hint": "provider 文件已补到 resources/glm/provider/（本机）；还缺一次 zcode login 和在 TUI 里选模型——CLI 没有 --model 参数",
-      "fix": "node \"D:/zcode/resources/glm/zcode.cjs\" login zai"
+      "hint": "CLI 找 resources/glm/provider/（本机实际在 resources/config/provider/，已补软链）；还缺一次性浏览器授权 + 在 TUI 里选模型。CLI 没有 --model 参数，不选模型时 headless 报 Select a model before sending a message",
+      "fix": "运行 login-agents.ps1 选 2（授权后进 TUI 输 /model 选一个模型）"
     },
     "dsh": {
       "label": "DSH (DeepSeek Harness)",

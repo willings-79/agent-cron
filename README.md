@@ -91,10 +91,26 @@ powershell -File "$runner\Get-AgentCronStatus.ps1"
 
 | agent | 无头入口 | 现状 |
 |---|---|---|
-| **Codex** | `codex exec` | ✅ 实测通过，复用桌面版登录，无需 API key |
-| **WorkBuddy** | `codebuddy -p --port <空闲端口>` | ⚠️ 要一次性 `codebuddy /login`（和桌面版登录分开）；未登录时它 exit 0 但不出结果，本工具按输出里的 `Authentication required` 判失败 |
-| **ZCode** | `zcode -p` | ⚠️ 两处：CLI 找 `resources\glm\provider\`（实际在 `resources\config\provider\`，本机已补）；还缺一次 `zcode login` + 在 TUI 里选模型（CLI 没有 `--model` 参数） |
-| **DSH** | `dsh headless` | ⚠️ 需要 `DEEPSEEK_API_KEY`，写进 job 的 `env` |
+| **Codex** | `codex exec` | ✅ 唯一端到端实测通过：复用桌面版登录，无需 API key，装完就能用 |
+| **WorkBuddy** | `codebuddy -p --port {port}` | ⚠️ 需一次性 TUI 登录，**未端到端验证** |
+| **ZCode** | `zcode -p` | ⚠️ 需一次性浏览器授权 + TUI 选模型，**未端到端验证** |
+| **DSH** | `dsh headless` | ⚠️ 需要 `DEEPSEEK_API_KEY`，写进 job 的 `env`，**未端到端验证** |
+
+**说清楚**：`verified` 目前只有 `codex` 和自检用的 `echo`。其余三个都是 `experimental`——适配表能把命令拼对、把明显失败（未登录、缺模型、缺 key、`Cannot find module`、`EADDRINUSE`）判成失败，但都还没有跑通过一次真实任务。别把它们当即插即用。
+
+WorkBuddy 这边有三个坑（v0.6.2 已修前两个）：
+
+- 该发行版 `cli\dist\` 只有 `codebuddy-lite-wb.mjs`，默认入口去找完整版 bundle，直接 `Cannot find module '../dist/codebuddy'`。适配表已注入 `CODEBUDDY_FORCE_LITE_WB_BUNDLE=1` 强制走 lite-wb。
+- 桌面版常驻占着 `127.0.0.1:55298`，不带 `--port` 会 `EADDRINUSE` 后静默退出。runner 用 `{port}` 每次自动取空闲端口。
+- `/login` 是 TUI 里的斜杠命令，**不是**命令行参数；写成 `codebuddy /login` 会什么都不做。
+
+### 一次性登录（只有 WB / ZCode 需要）
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\agent-cron\login-agents.ps1"
+```
+
+菜单选 1（WorkBuddy）或 2（ZCode）。脚本自动设环境变量、找空闲端口、拉起对应 CLI，你只需在界面里输 `/login` 或 `/model`，并在浏览器点一次同意。它不替你授权、不常驻、不改系统配置。只用 Codex 的话整段跳过。
 
 跑 `-Doctor` 会逐条告诉你缺什么。适配表在 `adapters.json`，加新 agent 不用改代码。
 

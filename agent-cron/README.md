@@ -42,11 +42,12 @@ powershell -NoProfile -File "$env:USERPROFILE\agent-cron\runner\Get-AgentCronSta
 
 | agent | 无头入口 | 状态 |
 |---|---|---|
-| codex | `codex exec` | 已验证，复用桌面版登录 |
-| workbuddy | `codebuddy -p` | 实验性，需桌面版已登录 |
-| zcode | `zcode -p` | 实验性，需补 provider 配置 |
-| dsh | `dsh headless` | 实验性，需 `DEEPSEEK_API_KEY` |
+| codex | `codex exec` | ✅ 已验证，复用桌面版登录 |
+| workbuddy | `codebuddy -p --port {port}` | ⚠️ 实验性：需一次性 TUI `/login`，与桌面版登录分开 |
+| zcode | `zcode -p` | ⚠️ 实验性：需浏览器授权 + TUI `/model` 选模型 |
+| dsh | `dsh headless` | ⚠️ 实验性：需 `DEEPSEEK_API_KEY` |
 
+只有 codex 端到端验证过，其余三个是 experimental。一次性登录跑 `login-agents.ps1`（菜单选 1 / 2），脚本会自动设好环境变量和空闲端口。
 跑 `Invoke-AgentCron.ps1 -Doctor` 看你机器上哪些能直接用；适配表在 `adapters.json`，加 agent 不用改代码。
 
 ## 语义

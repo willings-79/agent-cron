@@ -17,7 +17,7 @@ $out = Join-Path (Split-Path $repo -Parent) "agent-cron-v$Version.zip"
 if (Test-Path $out) { Remove-Item -LiteralPath $out -Force }
 
 $files = @(
-  'install-cron.ps1', 'adapters.json', 'jobs.sample.json', 'README.md', 'LICENSE',
+  'install-cron.ps1', 'login-agents.ps1', 'adapters.json', 'jobs.sample.json', 'README.md', 'LICENSE',
   'runner/Invoke-AgentCron.ps1', 'runner/Get-AgentCronStatus.ps1',
   'skills/agent-cron/SKILL.md'
 )

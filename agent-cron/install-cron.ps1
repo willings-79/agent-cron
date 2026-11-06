@@ -53,6 +53,7 @@ if ($PSCmdlet.ShouldProcess($Data, '创建运行时目录并复制 runner')) {
   }
   Copy-Item (Join-Path $Src 'runner\*.ps1') (Join-Path $Data 'runner') -Force
   Copy-Item (Join-Path $Src 'adapters.json') $Data -Force
+  if (Test-Path (Join-Path $Src 'login-agents.ps1')) { Copy-Item (Join-Path $Src 'login-agents.ps1') $Data -Force }
   if (Test-Path (Join-Path $SkillSrc 'SKILL.md')) { Copy-Item (Join-Path $SkillSrc 'SKILL.md') $Data -Force }
   $jobs = Join-Path $Data 'jobs.json'
   if (-not (Test-Path $jobs)) {
