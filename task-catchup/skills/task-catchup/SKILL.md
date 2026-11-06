@@ -15,7 +15,7 @@ description: 创建任何定时任务（Windows 计划任务 / cron / systemd ti
   `powershell -NoProfile -ExecutionPolicy Bypass -File <技能目录>\scripts\New-CatchupTask.ps1 -Name "日报" -Run "powershell.exe" -Arguments "-File C:\jobs\report.ps1" -Daily "09:00"`
   触发器可选：`-Daily "09:00"`、`-Weekly Monday,Friday -WeeklyAt "20:00"`、`-Hourly 2`、`-AtLogon`、`-AtStartup`；`-Wake` 附带睡眠唤醒；`-Force` 覆盖同名任务；**`-MaxDelayHours N` 可选补跑窗口**——错过超过 N 小时就不再补（生成守卫脚本于 `%USERPROFILE%\catchup-jobs\`，由任务实际调用），防止陈旧任务开机突袭；不传 = 默认窗口（日任务 24h、周任务 168h），`-MaxDelayHours 0` 才是总是补跑。用户提出"不想补太久之前的任务"时用它。**默认补跑窗口：日任务 24 小时、周任务 168 小时（一周）**，建任务时不必主动问；用户说"太旧的不补/只补 X 天内"用 `-MaxDelayHours N`（48=两天），用户说"不限时间、能补就补"用 `-MaxDelayHours 0`。`-MaxDelayHours` 仅支持 `-Daily`/`-Weekly`（与 `-Hourly`/`-AtLogon`/`-AtStartup` 组合会 throw）；守卫经 `ProcessStartInfo` 原样传参（参数含 `&`、`$` 等不受 PowerShell 二次解析影响），并自动记录 `<任务名>.last` 状态，同一次错过只执行一次。**`-Run` 必须是可执行文件（.exe/.bat/.cmd）**，不要直接传 .ps1——跑 PowerShell 脚本写成 `-Run powershell.exe -Arguments "-File C:\path\x.ps1"`。注意：`-AtStartup`（boot 触发器）必须管理员运行，非提权会 throw；`-AtLogon` 绑定当前用户、非提权可用。
 - 批量给已有任务开启补跑：
-  `powershell -NoProfile -ExecutionPolicy Bypass -File <技能目录>\scripts\Enable-TaskCatchup.ps1`（默认 dry-run 只列出；加 `-Apply` 才写入；只处理非 `\Microsoft\` 任务，`-Name` 支持通配）。
+  `powershell -NoProfile -ExecutionPolicy Bypass -File <技能目录>\scripts\Enable-TaskCatchup.ps1`（默认 dry-run 只列出；加 `-Apply` 才写入；只处理非 `\Microsoft\` 任务，`-Name` 支持通配）。默认跳过**厂商更新类**任务（名字以厂商前缀开头如 Wps/Nahimic/NIUpdate/360/Adobe，或以 `Updater` 结尾）——这些任务的补跑没有意义；用户明确要一起改时加 `-IncludeVendors`。
 
 手工执行要点（不用脚本时）：
 - PowerShell：`New-ScheduledTaskSettingsSet -StartWhenAvailable`，通过 `Register-ScheduledTask -Settings` 应用；改已有任务：`$t = Get-ScheduledTask -TaskName X; $t.Settings.StartWhenAvailable = $true; $t | Set-ScheduledTask`。

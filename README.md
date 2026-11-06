@@ -7,7 +7,7 @@
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![platform](https://img.shields.io/badge/platform-Windows%2010%2F11-lightgrey.svg)](#边界与限制)
 [![powershell](https://img.shields.io/badge/PowerShell-5.1%2B-blue.svg)](#直接用脚本)
-[![version](https://img.shields.io/badge/version-0.4.0-green.svg)](https://github.com/willings-79/task-catchup/releases)
+[![version](https://img.shields.io/badge/version-0.4.1-green.svg)](https://github.com/willings-79/task-catchup/releases)
 
 ---
 

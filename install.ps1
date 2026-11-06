@@ -6,7 +6,7 @@ task-catchup 一键安装：把技能装进"已检测到"的 agent 技能目录�
   powershell -ExecutionPolicy Bypass -File install.ps1 -WhatIf    # 预演
   -NoRules 不写规则；-ApplyExisting 顺带批量修补存量任务。
 安全：只对已存在目录/文件动手，不新建 agent 配置；已有指令文件写入前先备份 *.bak，
-并按原编码（UTF-8 BOM / 无 BOM UTF-8 / ANSI）读回写回，绝不破坏原有内容。
+并按原编码（UTF-8 BOM / 无 BOM UTF-8 / UTF-16 LE / UTF-16 BE / ANSI）读回写回，绝不破坏原有内容。
 #>
 [CmdletBinding(SupportsShouldProcess)]
 param(
