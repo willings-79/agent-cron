@@ -1,5 +1,6 @@
 ﻿#requires -Version 5.1
-<# 批量给已有用户级计划任务开启"错过补跑"。默认 dry-run，加 -Apply 才写入。 #>
+<# 附赠工具：批量给已有 Windows 计划任务开启"错过补跑"（StartWhenAvailable）。默认 dry-run，加 -Apply 才写入。
+   这是 task-catchup 时代留下的，给"不是 agent 建的老任务"用；agent-cron 的 job 不需要它。 #>
 [CmdletBinding()]
 param(
   [string]$Name = '*',

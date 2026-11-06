@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "jobs": [
+    {
+      "id": "hello",
+      "agent": "echo",
+      "enabled": true,
+      "schedule": "every 30m",
+      "prompt": "hello from agent-cron",
+      "cwd": "",
+      "timeoutMin": 1,
+      "maxDelayHours": 0
+    },
+    {
+      "id": "daily-report",
+      "agent": "codex",
+      "enabled": false,
+      "schedule": "daily 09:00",
+      "prompt": "扫一遍 D:\\repo 里昨天的提交，把要点写进 reports\\daily.md，5 条以内。",
+      "cwd": "D:\\repo",
+      "timeoutMin": 20,
+      "maxDelayHours": 24
+    },
+    {
+      "id": "weekly-backup",
+      "agent": "codex",
+      "enabled": false,
+      "schedule": "weekly fri 20:00",
+      "prompt": "把 D:\\repo 的未提交改动整理成一个 patch，写到 backups\\ 下并输出文件名。",
+      "cwd": "D:\\repo",
+      "timeoutMin": 30,
+      "maxDelayHours": 168
+    }
+  ]
+}

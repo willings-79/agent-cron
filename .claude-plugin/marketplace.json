@@ -1,15 +1,12 @@
 {
-  "name": "task-catchup",
-  "owner": {
-    "name": "willings-79",
-    "url": "https://github.com/willings-79/task-catchup"
-  },
+  "name": "agent-cron",
+  "owner": { "name": "willings-79" },
   "plugins": [
     {
-      "name": "task-catchup",
-      "source": "./task-catchup",
-      "description": "Scheduled-task catch-up patch: missed tasks run right after boot (StartWhenAvailable / systemd Persistent / anacron)",
-      "version": "0.4.1"
+      "name": "agent-cron",
+      "source": "./agent-cron",
+      "description": "Scheduled agent jobs with catch-up: run Codex / WorkBuddy / ZCode / DSH headlessly, and catch up the run you missed while the machine was off",
+      "version": "0.5.0"
     }
   ]
 }

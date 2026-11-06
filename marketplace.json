@@ -1,14 +1,14 @@
 {
-  "name": "task-catchup-market",
+  "name": "agent-cron-market",
   "plugins": [
     {
-      "name": "task-catchup",
-      "source": "./task-catchup",
-      "version": "0.4.1",
-      "description": "Scheduled-task catch-up patch: missed tasks run right after boot",
-      "displayName": "Task Catchup",
-      "displayName_i18n": { "zh-CN": "定时任务补跑补丁" },
-      "description_i18n": { "zh-CN": "让各家 agent 创建的定时任务错过时间点后开机自动补跑（Windows StartWhenAvailable / systemd Persistent / anacron），含建任务与批量修补脚本" },
+      "name": "agent-cron",
+      "source": "./agent-cron",
+      "version": "0.5.0",
+      "description": "Scheduled agent jobs with catch-up for Codex / WorkBuddy / ZCode / DSH",
+      "displayName": "Agent Cron",
+      "displayName_i18n": { "zh-CN": "Agent 定时任务（错过也补跑）" },
+      "description_i18n": { "zh-CN": "把「让 agent 每天/每周自动做某件事」落成 job 清单，由一个 15 分钟心跳对账执行：机器关过、到点没跑，下次醒来补上最近一次。支持 Codex / WorkBuddy / ZCode / DSH 的无头入口。" },
       "category": "productivity"
     }
   ]

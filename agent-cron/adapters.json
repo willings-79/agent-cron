@@ -1,0 +1,57 @@
+{
+  "version": 2,
+  "note": "agent 适配表。exe 可以是绝对路径或 PATH 里的命令名；args 里 {prompt} / {cwd} / {port} 会被替换（{port} 每次运行自动取空闲端口）。failPattern 命中即判失败——有些 CLI 未登录时仍 exit 0。",
+  "agents": {
+    "codex": {
+      "label": "Codex",
+      "verified": true,
+      "exe": "codex.cmd",
+      "fallbackExe": ["codex"],
+      "args": ["exec", "--skip-git-repo-check", "--sandbox", "read-only", "-C", "{cwd}", "{prompt}"],
+      "env": {},
+      "failPattern": [],
+      "timeoutMin": 20,
+      "hint": "复用 codex 已登录的会话，无需 API key（已实测）"
+    },
+    "workbuddy": {
+      "label": "WorkBuddy",
+      "verified": false,
+      "exe": "node.exe",
+      "args": ["D:\\workbuddy\\resources\\app.asar.unpacked\\cli\\bin\\codebuddy", "-p", "{prompt}", "--port", "{port}"],
+      "env": {},
+      "failPattern": ["Authentication required", "not signed in", "/login"],
+      "timeoutMin": 20,
+      "hint": "需先跑一次 codebuddy /login（浏览器授权，和桌面版登录分开）；必须带 --port，否则和桌面版抢端口失败"
+    },
+    "zcode": {
+      "label": "ZCode",
+      "verified": false,
+      "exe": "node.exe",
+      "args": ["D:\\zcode\\resources\\glm\\zcode.cjs", "-p", "{prompt}", "--cwd", "{cwd}"],
+      "env": {},
+      "failPattern": ["无法定位 CLI ZCode", "provider"],
+      "timeoutMin": 20,
+      "hint": "缺 provider 配置：CLI 找 resources\\glm\\provider\\zcode-builtin.json，实际在 resources\\config\\provider\\"
+    },
+    "dsh": {
+      "label": "DSH (DeepSeek Harness)",
+      "verified": false,
+      "exe": "D:\\DeepSeek Harness.new-{1206E67A-17A8-42B9-8976-92FB26540F91}\\resources\\runtime\\cli\\bin\\dsh.cmd",
+      "args": ["headless", "{prompt}"],
+      "env": { "DEEPSEEK_API_KEY": "" },
+      "failPattern": ["MISSING_CREDENTIAL"],
+      "timeoutMin": 20,
+      "hint": "需要 DEEPSEEK_API_KEY；在该 job 的 env 里给"
+    },
+    "echo": {
+      "label": "Echo（自检用）",
+      "verified": true,
+      "exe": "cmd.exe",
+      "args": ["/c", "echo {prompt}"],
+      "env": {},
+      "failPattern": [],
+      "timeoutMin": 1,
+      "hint": "不调用任何模型，用来验证调度/去重/日志"
+    }
+  }
+}
