@@ -254,6 +254,7 @@ if ($Doctor) {
     $verified = if ($spec.verified) { 'verified' } else { 'experimental' }
     Say ("[{0}] {1,-10} {2,-14} {3}" -f $mark, $name, $verified, $resolved)
     if ($spec.hint) { Say ("       " + $spec.hint) }
+    if ($spec.fix) { Say ("       修复: " + $spec.fix) }
   }
   Say ""
   Say "说明：MISS 表示找不到可执行文件；experimental 表示入口存在但尚未端到端验证。"

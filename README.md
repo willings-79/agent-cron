@@ -68,15 +68,15 @@ powershell -File "$runner\Get-AgentCronStatus.ps1"
 |---|---|---|
 | **Codex** | `codex exec` | ✅ 实测通过，复用桌面版登录，无需 API key |
 | **WorkBuddy** | `codebuddy -p --port <空闲端口>` | ⚠️ 要一次性 `codebuddy /login`（和桌面版登录分开）；未登录时它 exit 0 但不出结果，本工具按输出里的 `Authentication required` 判失败 |
-| **ZCode** | `zcode -p` | ⚠️ 缺 provider 配置路径（CLI 找 `resources\glm\provider\`，实际在 `resources\config\provider\`） |
+| **ZCode** | `zcode -p` | ⚠️ 两处：CLI 找 `resources\glm\provider\`（实际在 `resources\config\provider\`，本机已补）；还缺一次 `zcode login` + 在 TUI 里选模型（CLI 没有 `--model` 参数） |
 | **DSH** | `dsh headless` | ⚠️ 需要 `DEEPSEEK_API_KEY`，写进 job 的 `env` |
 
 跑 `-Doctor` 会逐条告诉你缺什么。适配表在 `adapters.json`，加新 agent 不用改代码。
 
 ## 安装（市场 / 手动）
 
-- **ZCode**：插件市场 → Discover → `+` → 仓库 `willings-79/task-catchup`（仓库尚未改名，见文末）
-- **Claude Code**：`/plugin marketplace add willings-79/task-catchup`
+- **ZCode**：插件市场 → Discover → `+` → 仓库 `willings-79/agent-cron`
+- **Claude Code**：`/plugin marketplace add willings-79/agent-cron`
 - **Codex / WorkBuddy / DSH**：把 `agent-cron/skills/agent-cron` 复制进各自技能目录，或直接跑 `install-cron.ps1`
 - **不用 agent**：`install-cron.ps1` 装好一切，你只编辑 `jobs.json`
 

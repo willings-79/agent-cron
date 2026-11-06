@@ -6,48 +6,92 @@
       "label": "Codex",
       "verified": true,
       "exe": "codex.cmd",
-      "fallbackExe": ["codex"],
-      "args": ["exec", "--skip-git-repo-check", "--sandbox", "read-only", "-C", "{cwd}", "{prompt}"],
+      "fallbackExe": [
+        "codex"
+      ],
+      "args": [
+        "exec",
+        "--skip-git-repo-check",
+        "--sandbox",
+        "read-only",
+        "-C",
+        "{cwd}",
+        "{prompt}"
+      ],
       "env": {},
       "failPattern": [],
       "timeoutMin": 20,
-      "hint": "复用 codex 已登录的会话，无需 API key（已实测）"
+      "hint": "复用 codex 已登录的会话，无需 API key（已实测）",
+      "fix": ""
     },
     "workbuddy": {
       "label": "WorkBuddy",
       "verified": false,
       "exe": "node.exe",
-      "args": ["D:\\workbuddy\\resources\\app.asar.unpacked\\cli\\bin\\codebuddy", "-p", "{prompt}", "--port", "{port}"],
+      "args": [
+        "D:\\workbuddy\\resources\\app.asar.unpacked\\cli\\bin\\codebuddy",
+        "-p",
+        "{prompt}",
+        "--port",
+        "{port}"
+      ],
       "env": {},
-      "failPattern": ["Authentication required", "not signed in", "/login"],
+      "failPattern": [
+        "Authentication required",
+        "not signed in",
+        "/login"
+      ],
       "timeoutMin": 20,
-      "hint": "需先跑一次 codebuddy /login（浏览器授权，和桌面版登录分开）；必须带 --port，否则和桌面版抢端口失败"
+      "hint": "需先跑一次 codebuddy /login（浏览器授权，和桌面版登录分开）；必须带 --port。实测未登录时 exit 0 但输出 Authentication required，本工具判 78",
+      "fix": "node \"D:/workbuddy/resources/app.asar.unpacked/cli/bin/codebuddy\" /login"
     },
     "zcode": {
       "label": "ZCode",
       "verified": false,
       "exe": "node.exe",
-      "args": ["D:\\zcode\\resources\\glm\\zcode.cjs", "-p", "{prompt}", "--cwd", "{cwd}"],
+      "args": [
+        "D:\\zcode\\resources\\glm\\zcode.cjs",
+        "-p",
+        "{prompt}",
+        "--cwd",
+        "{cwd}"
+      ],
       "env": {},
-      "failPattern": ["无法定位 CLI ZCode", "provider"],
+      "failPattern": [
+        "无法定位 CLI ZCode",
+        "provider",
+        "Select a model"
+      ],
       "timeoutMin": 20,
-      "hint": "缺 provider 配置：CLI 找 resources\\glm\\provider\\zcode-builtin.json，实际在 resources\\config\\provider\\"
+      "hint": "provider 文件已补到 resources\\glm\\provider\\（本机）；还缺一次 zcode login（浏览器授权）和在 TUI 里选模型——CLI 没有 --model 参数",
+      "fix": "node \"D:/zcode/resources/glm/zcode.cjs\" login zai"
     },
     "dsh": {
       "label": "DSH (DeepSeek Harness)",
       "verified": false,
       "exe": "D:\\DeepSeek Harness.new-{1206E67A-17A8-42B9-8976-92FB26540F91}\\resources\\runtime\\cli\\bin\\dsh.cmd",
-      "args": ["headless", "{prompt}"],
-      "env": { "DEEPSEEK_API_KEY": "" },
-      "failPattern": ["MISSING_CREDENTIAL"],
+      "args": [
+        "headless",
+        "{prompt}"
+      ],
+      "env": {
+        "DEEPSEEK_API_KEY": ""
+      },
+      "failPattern": [
+        "MISSING_CREDENTIAL"
+      ],
       "timeoutMin": 20,
-      "hint": "需要 DEEPSEEK_API_KEY；在该 job 的 env 里给"
+      "hint": "需要 DEEPSEEK_API_KEY；在该 job 的 env 里给",
+      "fix": "在 jobs.json 的 env 里写 DEEPSEEK_API_KEY"
     },
     "echo": {
       "label": "Echo（自检用）",
       "verified": true,
       "exe": "cmd.exe",
-      "args": ["/c", "echo {prompt}"],
+      "args": [
+        "/c",
+        "echo {prompt}"
+      ],
       "env": {},
       "failPattern": [],
       "timeoutMin": 1,
