@@ -91,8 +91,18 @@ if (-not $NoSkill -and (Test-Path (Join-Path $SkillSrc 'SKILL.md'))) {
 }
 
 "`n== 2. 注册心跳任务（每 $IntervalMinutes 分钟 + 登录时）=="
-$action = New-ScheduledTaskAction -Execute 'powershell.exe' `
-  -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$Runner`" -Root `"$Data`" -Quiet"
+# 任务以交互身份启动控制台程序时，系统会先建控制台窗口、-WindowStyle Hidden 只是事后隐藏 → 每轮闪一下。
+# Win11 22000+ 改用 conhost --headless，从源头不创建窗口；旧系统回退到原来的隐藏参数。
+$winBuild = [int](Get-CimInstance Win32_OperatingSystem).BuildNumber
+if ($winBuild -ge 22000) {
+  $action = New-ScheduledTaskAction -Execute 'conhost.exe' `
+    -Argument "--headless -- powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$Runner`" -Root `"$Data`" -Quiet"
+  "launcher: conhost.exe --headless（无窗口）"
+} else {
+  $action = New-ScheduledTaskAction -Execute 'powershell.exe' `
+    -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$Runner`" -Root `"$Data`" -Quiet"
+  "launcher: powershell.exe -WindowStyle Hidden（旧系统回退，可能闪窗）"
+}
 $t1 = New-ScheduledTaskTrigger -AtLogOn -User ([Security.Principal.WindowsIdentity]::GetCurrent().Name)
 # 登录后延迟 30 秒：实测登录初期（桌面还在初始化）启动的隐藏控制台进程可能收到 CTRL_CLOSE_EVENT
 # 被强行中断（退出码 0xC000013A），导致正在跑的 job 被腰斩。延迟可避开这个窗口。
