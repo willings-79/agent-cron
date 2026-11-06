@@ -309,6 +309,25 @@ try {
 }
 
 try {
+  # 上次被强行中断的遗留标记：说明有 job 跑到一半进程就没了
+  # （实测：登录初期启动的隐藏控制台会收到 CTRL_CLOSE_EVENT，任务返回 0xC000013A）
+  Get-ChildItem $StateDir -Filter '*.inflight' -ErrorAction SilentlyContinue | ForEach-Object {
+    $iid = $_.BaseName
+    $meta = $null
+    try { $meta = Get-Content $_.FullName -Raw -Encoding UTF8 | ConvertFrom-Json } catch { }
+    $alive = $false
+    if ($meta -and $meta.pid) { $alive = [bool](Get-Process -Id ([int]$meta.pid) -ErrorAction SilentlyContinue) }
+    if (-not $alive) {
+      Say ("[interrupted] {0}：上次运行未正常结束（进程已不在），按未完成重试" -f $iid)
+      Add-RunLog ([pscustomobject]@{
+        ts = (Get-Date).ToString('o'); id = $iid; agent = $null
+        due = $(if ($meta) { $meta.due } else { $null })
+        reason = 'interrupted'; ms = $null; exit = $null; timedOut = $false; failures = $null; log = $null
+      })
+      Remove-Item $_.FullName -Force -ErrorAction SilentlyContinue
+    }
+  }
+
   $cfg = Get-Content $ConfigPath -Raw -Encoding UTF8 | ConvertFrom-Json
   $settings = $cfg.settings
   $retentionDays = if ($settings -and $settings.logRetentionDays) { [int]$settings.logRetentionDays } else { 14 }
@@ -409,7 +428,16 @@ try {
     $dueText = if ($due) { ([datetime]$due).ToString('o') } else { $now.ToString('o') }
     Say ("[run] {0} → {1}（{2}）" -f $j.id, $j.agent, $reason)
 
+    # 在飞标记：进程若被强行中断（如登录初期收到 CTRL_CLOSE_EVENT），这个文件会留下，
+    # 下次心跳据此判定"上次跑到一半"，而不是当作没跑过。
+    $inflight = Join-Path $StateDir "$($j.id).inflight"
+    try {
+      (@{ pid = $PID; started = $now.ToString('o'); due = $dueText; reason = $reason } | ConvertTo-Json -Compress) |
+        Set-Content -Path $inflight -Encoding UTF8
+    } catch { }
+
     $r = Invoke-Process $spec.Exe $argString $cwd ($timeoutMin * 60) $envMap
+    Remove-Item $inflight -Force -ErrorAction SilentlyContinue
 
     $failNote = $null
     if (-not $r.timedOut -and $r.exit -eq 0) {

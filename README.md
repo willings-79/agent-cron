@@ -28,6 +28,18 @@ jobs.json ──► 心跳（计划任务 / 15min + 登录）──► runner �
 | 失败后每 15 分钟重试烧额度 | 间隔型 job 失败退避：15 分钟起，连续失败翻倍 |
 | 一个 job 要求只读，另一个要写 | `sandbox` 必须由适配表声明支持；不支持就跳过，不静默降级 |
 | 日志里有私有代码 | `logRetentionDays` 自动清理、`maxLogKB` 截断、`logContent:false` 只留尾部 30 行 |
+| 开机后首次心跳被系统掐断 | 任务级 `RestartOnFailure`（3 次 / 1 分钟）+ 登录后延迟 30 秒 + `state\<id>.inflight` 标记，下次心跳识别为 `interrupted` |
+
+### 真机上验过：关机跨过执行时间，开机后补上了
+
+2026-11-06 16:42 到期的两个 job，机器正在重启；16:45:38 登录后心跳自动补跑。
+
+| 证据 | 值 |
+|---|---|
+| `proof-echo.txt` 修改时间 | 16:37:40 → **16:45:46**（开机后重写，不是原来那份） |
+| `runs.jsonl` | `due=16:42:00 / reason=catchup / exit=0` |
+| 心跳任务 `LastRunTime` | 16:45:38 —— `StartWhenAvailable` 补上了错过的触发 |
+| 16:53 那次正常心跳 | `Result=0`，没有重复执行（`.last`/state 已推进） |
 
 ## 30 秒装上
 

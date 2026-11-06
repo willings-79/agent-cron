@@ -93,9 +93,13 @@ if (-not $NoSkill -and (Test-Path (Join-Path $SkillSrc 'SKILL.md'))) {
 $action = New-ScheduledTaskAction -Execute 'powershell.exe' `
   -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$Runner`" -Root `"$Data`" -Quiet"
 $t1 = New-ScheduledTaskTrigger -AtLogOn -User ([Security.Principal.WindowsIdentity]::GetCurrent().Name)
+# 登录后延迟 30 秒：实测登录初期（桌面还在初始化）启动的隐藏控制台进程可能收到 CTRL_CLOSE_EVENT
+# 被强行中断（退出码 0xC000013A），导致正在跑的 job 被腰斩。延迟可避开这个窗口。
+try { $t1.Delay = 'PT30S' } catch { }
 $t2 = New-ScheduledTaskTrigger -Once -At (Get-Date).AddMinutes(1) -RepetitionInterval (New-TimeSpan -Minutes $IntervalMinutes)
 $settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -MultipleInstances IgnoreNew `
-  -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit (New-TimeSpan -Hours 3)
+  -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit (New-TimeSpan -Hours 3) `
+  -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1)
 $principal = New-ScheduledTaskPrincipal -UserId ([Security.Principal.WindowsIdentity]::GetCurrent().Name) -LogonType Interactive -RunLevel Limited
 
 if ($PSCmdlet.ShouldProcess($TaskName, '注册心跳任务')) {

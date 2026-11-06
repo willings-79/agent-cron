@@ -6,7 +6,7 @@
       "name": "agent-cron",
       "source": "./agent-cron",
       "description": "Scheduled agent jobs with catch-up: run Codex / WorkBuddy / ZCode / DSH headlessly, and catch up the run you missed while the machine was off",
-      "version": "0.6.0"
+      "version": "0.6.1"
     }
   ]
 }
