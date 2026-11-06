@@ -47,6 +47,16 @@ description: 给 Codex / WorkBuddy / ZCode / DSH 这类桌面版 agent 建"会�
 | `cwd` | 建议 | agent 的工作目录；不填则用数据目录 |
 | `timeoutMin` | 否 | 超时杀掉，默认 20 |
 | `maxDelayHours` | 否 | 错过超过 N 小时就不补，默认 24；`0` = 不限 |
+| `sandbox` | 否 | `read-only` / `workspace-write`；只有 codex 适配支持，其它 agent 传了会被跳过（除非 `allowUnsupportedSandbox:true`） |
+| `verify` | 否 | 跑完后的校验命令（`cmd /c` 执行）；exit≠0 记为失败（79）。用于"agent 说成功但产物没生成" |
+| `verifyTimeoutSec` | 否 | 校验命令超时，默认 120 |
+| `logContent` | 否 | `false` 只保留输出末尾 30 行（隐私优先） |
+| `maxLogKB` | 否 | 单次日志上限，超出截断；默认取 settings.maxLogKB |
+| `retryBackoffMinutes` | 否 | 间隔型 job 失败后的退避基数，默认 15（连续失败会翻倍） |
+
+顶层 `settings`：`logRetentionDays`（默认 14 天）、`maxLogKB`（默认 512）、`retryBackoffMinutes`（默认 15）。
+
+`-Force` 只忽略时间窗口；要跑 `enabled:false` 的 job 必须再给 `-IncludeDisabled`。
 | `enabled` | 否 | `false` 暂停 |
 | `env` | 否 | 该 job 需要的环境变量（如 DSH 的 `DEEPSEEK_API_KEY`） |
 

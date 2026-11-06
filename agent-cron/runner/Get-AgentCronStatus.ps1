@@ -75,15 +75,16 @@ if ($History -gt 0) {
 }
 
 "== agent-cron @ $DataDir =="
-"{0,-18} {1,-10} {2,-16} {3,-18} {4,-8} {5}" -f 'JOB', 'AGENT', 'SCHEDULE', 'LAST SUCCESS', 'EXIT', 'NEXT DUE'
+"{0,-18} {1,-10} {2,-16} {3,-18} {4,-7} {5,-6} {6}" -f 'JOB', 'AGENT', 'SCHEDULE', 'LAST SUCCESS', 'EXIT', 'FAILS', 'NEXT DUE'
 foreach ($j in @($cfg.jobs)) {
   if (-not $j.id) { continue }
   $sp = Join-Path $StateDir "$($j.id).json"
   $st = if (Test-Path $sp) { Get-Content $sp -Raw -Encoding UTF8 | ConvertFrom-Json } else { $null }
   $lastOk = if ($st -and $st.lastSuccess) { ([datetime]$st.lastSuccess).ToString('MM-dd HH:mm') } else { '—' }
   $exit = if ($st -and $null -ne $st.lastExit) { $st.lastExit } else { '—' }
+  $fails = if ($st -and $st.consecutiveFailures) { $st.consecutiveFailures } else { '—' }
   $next = Get-NextDue $j.schedule $now $(if ($st) { $st.lastSuccess } else { $null })
   $nextText = if ($next) { ([datetime]$next).ToString('MM-dd HH:mm') } else { '?' }
   $disabled = if ($j.enabled -eq $false) { ' (disabled)' } else { '' }
-  "{0,-18} {1,-10} {2,-16} {3,-18} {4,-8} {5}{6}" -f $j.id, $j.agent, $j.schedule, $lastOk, $exit, $nextText, $disabled
+  "{0,-18} {1,-10} {2,-16} {3,-18} {4,-7} {5,-6} {6}{7}" -f $j.id, $j.agent, $j.schedule, $lastOk, $exit, $fails, $nextText, $disabled
 }

@@ -4,7 +4,7 @@
     {
       "name": "agent-cron",
       "source": "./agent-cron",
-      "version": "0.5.1",
+      "version": "0.6.0",
       "description": "Scheduled agent jobs with catch-up for Codex / WorkBuddy / ZCode / DSH",
       "displayName": "Agent Cron",
       "displayName_i18n": { "zh-CN": "Agent 定时任务（错过也补跑）" },

@@ -1,6 +1,6 @@
 {
   "name": "agent-cron",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "Scheduled agent jobs with catch-up: run Codex / WorkBuddy / ZCode / DSH headlessly, and if the machine was off, catch up the missed run",
   "author": { "name": "willings-79" },
   "skills": "./skills"

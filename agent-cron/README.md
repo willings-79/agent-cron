@@ -53,8 +53,13 @@ powershell -NoProfile -File "$env:USERPROFILE\agent-cron\runner\Get-AgentCronSta
 
 - 合并补跑：漏三次补一次
 - 过期跳过：超过 `maxDelayHours` 不补，防"开机瞬间翻出半年前的活"
-- 不并发：上一个没跑完，这一轮跳过
+- 不并发：上一个没跑完，这一轮跳过（锁里写 PID，持有进程没了才抢占）
+- 失败退避：间隔型 job 失败后 15 分钟起、连续失败翻倍，不每轮重试
 - 可审计：每次运行写 `logs\<id>-<时间>.log` + `runs.jsonl`
+- 假成功防护：`failPattern`（CLI 未登录仍 exit 0）+ `verify`（agent 说完成但产物没生成）
+- 隐私：`logRetentionDays` 自动清理、`maxLogKB` 截断、`logContent:false` 只留尾部 30 行
+
+`-Force` 只忽略时间；要跑 `enabled:false` 的 job 加 `-IncludeDisabled`。
 
 ## 卸载
 

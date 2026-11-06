@@ -1,5 +1,10 @@
 {
   "version": 1,
+  "settings": {
+    "logRetentionDays": 14,
+    "maxLogKB": 512,
+    "retryBackoffMinutes": 15
+  },
   "jobs": [
     {
       "id": "hello",
@@ -19,7 +24,11 @@
       "prompt": "扫一遍 D:\\repo 里昨天的提交，把要点写进 reports\\daily.md，5 条以内。",
       "cwd": "D:\\repo",
       "timeoutMin": 20,
-      "maxDelayHours": 24
+      "maxDelayHours": 24,
+      "sandbox": "workspace-write",
+      "verify": "if not exist reports\\daily.md exit 1",
+      "verifyTimeoutSec": 60,
+      "logContent": true
     },
     {
       "id": "weekly-backup",

@@ -18,6 +18,17 @@ jobs.json ──► 心跳（计划任务 / 15min + 登录）──► runner �
 - 每次运行都有 **exit code / 耗时 / 完整输出**，落在 `logs\<job>-<时间>.log`
 - 同一 job 不并发：上一轮没跑完，这一轮跳过
 
+### 它按"不可信"来设计
+
+| 问题 | 做法 |
+|---|---|
+| CLI 没登录却 `exit 0` | `failPattern` 命中输出里的关键字 → 判 78，不记成功 |
+| agent 说跑完了，产物没生成 | `verify` 命令：agent 退出 0 之后还要过校验，否则判 79 |
+| 任务越跑越久、锁住别的轮次 | 锁里写 PID，只有持有进程真的没了才抢占（不靠猜时间） |
+| 失败后每 15 分钟重试烧额度 | 间隔型 job 失败退避：15 分钟起，连续失败翻倍 |
+| 一个 job 要求只读，另一个要写 | `sandbox` 必须由适配表声明支持；不支持就跳过，不静默降级 |
+| 日志里有私有代码 | `logRetentionDays` 自动清理、`maxLogKB` 截断、`logContent:false` 只留尾部 30 行 |
+
 ## 30 秒装上
 
 ```powershell
@@ -46,7 +57,9 @@ powershell -NoProfile -File "$env:USERPROFILE\agent-cron\runner\Invoke-AgentCron
       "prompt": "扫一遍昨天仓库里的提交，把要点写进 reports\\daily.md，5 条以内。",
       "cwd": "D:\\repo",
       "timeoutMin": 20,
-      "maxDelayHours": 24
+      "maxDelayHours": 24,
+      "sandbox": "workspace-write",
+      "verify": "if not exist reports\\daily.md exit 1"
     }
   ]
 }
